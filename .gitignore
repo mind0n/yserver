@@ -20,6 +20,7 @@ mono_crash.*
 publish
 ngp.bat
 dist
+
 *.bak
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -30,7 +31,11 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+[Bb]in/debug
+[Bb]in/release
+[Bb]in/publish
+[Bb]in/*.dll
+[Bb]in/*.exe
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/

@@ -1,0 +1,24 @@
+{
+  "name": "yserv",
+  "version": "1.0.4",
+  "description": "Portable customizable web server",
+  "main": "./bin/index.js",
+  "preferGlobal":true,
+  "bin":{"yserv":"./bin/yserver.exe"},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mind0n/yserver.git"
+  },
+  "keywords": [
+    "yserv", "yserver", "y_server", "y-server", "web server", "web-server", "dev server", "dev-server", "why server"
+  ],
+  "author": "mind0n",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mind0n/yserver/issues"
+  },
+  "homepage": "https://github.com/mind0n/yserver#readme"
+}
