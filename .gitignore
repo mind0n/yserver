@@ -17,6 +17,10 @@
 mono_crash.*
 
 # Build results
+publish
+ngp.bat
+dist
+*.bak
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "yserver", "yserver.csproj", "{7D320528-665C-49E0-911E-9352371425FA}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "handy.core", "..\..\pv\handy\handy.core\handy.core.shproj", "{8D1D3232-F7E8-417D-BA7A-4345AD7C509A}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "handy.net", "..\..\pv\handy\handy.net\handy.net.shproj", "{E6F815FF-AE11-4D06-A80D-657B3407B5B3}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "handy.storage", "..\..\pv\handy\handy.storage\handy.storage.shproj", "{F79C70B7-56BE-4697-9C28-92D8C93DC81E}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\pv\handy\handy.core\handy.core.projitems*{7d320528-665c-49e0-911e-9352371425fa}*SharedItemsImports = 5
+		..\..\pv\handy\handy.net\handy.net.projitems*{7d320528-665c-49e0-911e-9352371425fa}*SharedItemsImports = 5
+		..\..\pv\handy\handy.storage\handy.storage.projitems*{7d320528-665c-49e0-911e-9352371425fa}*SharedItemsImports = 5
+		..\..\pv\handy\handy.core\handy.core.projitems*{8d1d3232-f7e8-417d-ba7a-4345ad7c509a}*SharedItemsImports = 13
+		..\..\pv\handy\handy.net\handy.net.projitems*{e6f815ff-ae11-4d06-a80d-657b3407b5b3}*SharedItemsImports = 13
+		..\..\pv\handy\handy.storage\handy.storage.projitems*{f79c70b7-56be-4697-9c28-92d8c93dc81e}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7D320528-665C-49E0-911E-9352371425FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D320528-665C-49E0-911E-9352371425FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D320528-665C-49E0-911E-9352371425FA}.Debug|x64.ActiveCfg = Debug|x64
+		{7D320528-665C-49E0-911E-9352371425FA}.Debug|x64.Build.0 = Debug|x64
+		{7D320528-665C-49E0-911E-9352371425FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D320528-665C-49E0-911E-9352371425FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D320528-665C-49E0-911E-9352371425FA}.Release|x64.ActiveCfg = Release|x64
+		{7D320528-665C-49E0-911E-9352371425FA}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A869791-230F-4F07-A2C9-6E6CB6675EDD}
+	EndGlobalSection
+EndGlobal
