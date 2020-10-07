@@ -1,15 +1,30 @@
 ﻿using handy;
 using System;
+using System.IO;
 
 namespace yserver
 {
-    class Program
+    public class Program
     {
+        public static dynamic cfg { get; set; }
         static void Main(string[] args)
         {
+            log.Regist(new FileLogWriter(), new ConsoleLogWriter());
             RouteManager rm = new RouteManager();
-            rm.Regist(typeof(WebBizUnit), true);
-            Extensions.Socket(8880, (x) =>
+            rm.Regist(typeof(WebBizUnit), true, true);
+            var configfile = Path.Combine(Environment.CurrentDirectory, "server.json");
+            if (!File.Exists(configfile))
+            {
+                log.e($"Missing config file: {configfile}");
+                return;
+            }
+            cfg = EmrInstance.LoadFile(configfile);
+            if (cfg == null)
+            {
+                log.e($"Failed to load config file: {configfile}");
+                return;
+            }
+            Extensions.Socket((int)cfg.port, (x) =>
             {
                 var r = x.Request;
                 var s = x.Response;
@@ -46,8 +61,9 @@ namespace yserver
         public WebBizUnit(SocketHttpContext ctx) : base(ctx) { }
         public string Default()
         {
-            var file = "ws.html".SearchFile();
-            return "200 OK";
+            //var file = Program.cfg
+            var r = string.Join("\\",Request.Routes);
+            return $"{r} - {Environment.CurrentDirectory}";
         }
     }
 }

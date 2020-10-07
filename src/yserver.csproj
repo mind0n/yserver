@@ -26,6 +26,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="server.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Project="..\..\pv\handy\handy.core\handy.core.projitems" Label="Shared" />
 
   <Import Project="..\..\pv\handy\handy.net\handy.net.projitems" Label="Shared" />

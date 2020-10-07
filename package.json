@@ -1,10 +1,10 @@
 {
-  "name": "yserv",
-  "version": "1.0.4",
-  "description": "Portable customizable web server",
+  "name": "ncserver",
+  "version": "1.0.11",
+  "description": ".net core web server",
   "main": "./bin/index.js",
   "preferGlobal":true,
-  "bin":{"yserv":"./bin/yserver.exe"},
+  "bin":{"ncserver":"./bin/yserver.exe"},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
