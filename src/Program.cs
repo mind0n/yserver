@@ -64,6 +64,10 @@ namespace yserver
         {
             var rooturl = cfg.Get("rooturl", "/");
             var rootdir = cfg.Get("rootdir", Environment.CurrentDirectory);
+            if ("/".Equals(rootdir) || "\\".Equals(rootdir))
+            {
+                rootdir = string.Empty;
+            }
             rootdir = rootdir.FullPath(Environment.CurrentDirectory);
             var r = string.Join("/",Request.Routes);
             if (r.StartsWith(rooturl))
@@ -79,7 +83,7 @@ namespace yserver
             {
                 r = '/' + r;
             }
-            var p = $"{rootdir}{r.Replace('/', '\\')}".Replace("..", string.Empty);
+            var p = $"{rootdir.Replace('/', '\\')}{r.Replace('/', '\\')}".Replace("..", string.Empty);
             if (File.Exists(p))
             {
                 Response.HttpStatusCode = 200;
