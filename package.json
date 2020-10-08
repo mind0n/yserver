@@ -1,6 +1,6 @@
 {
   "name": "ncserver",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": ".net core web server",
   "main": "./bin/index.js",
   "preferGlobal":true,
