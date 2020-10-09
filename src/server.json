@@ -1,5 +1,6 @@
 {
-  "port": 80,
+  "port": 8880,
   "rooturl": "/",
-  "rootdir": "/"
+  "rootdir": "/",
+  "entrydoc": "index.html"
 }

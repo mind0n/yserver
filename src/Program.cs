@@ -10,6 +10,7 @@ namespace yserver
         static void Main(string[] args)
         {
             log.Regist(new FileLogWriter(), new ConsoleLogWriter());
+            Settings.Instance.Regist(new FileSettingsReader());
             RouteManager rm = new RouteManager();
             rm.Regist(typeof(WebBizUnit), true, true);
             var configfile = Path.Combine(Environment.CurrentDirectory, "server.json");
@@ -84,11 +85,15 @@ namespace yserver
                 r = '/' + r;
             }
             var p = $"{rootdir.Replace('/', '\\')}{r.Replace('/', '\\')}".Replace("..", string.Empty);
+            var entrydoc = cfg.Get<string>("entrydoc");
+            if (!File.Exists(p) && !string.IsNullOrWhiteSpace(entrydoc))
+            {
+                p = Path.Combine(p, entrydoc.Replace("..", ""));
+            }
             if (File.Exists(p))
             {
                 Response.HttpStatusCode = 200;
-                var type = Response.Socket.WriteFile(p);
-                Response.ContentType = type;
+                Response.Socket.WriteFile(p);
                 return null;
             }
             Response.HttpStatusCode = 404;

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "yserver", "yserver.csproj", "{7D320528-665C-49E0-911E-9352371425FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ncserver", "ncserver.csproj", "{7D320528-665C-49E0-911E-9352371425FA}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "handy.core", "..\..\pv\handy\handy.core\handy.core.shproj", "{8D1D3232-F7E8-417D-BA7A-4345AD7C509A}"
 EndProject
