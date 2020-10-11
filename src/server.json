@@ -2,5 +2,10 @@
   "port": 8880,
   "rooturl": "/",
   "rootdir": "/",
-  "entrydoc": "index.html"
+  "entrydoc": "index.html",
+  "onstart": [
+    "cmd /c erase .\\dist\\*.* /Q",
+    "cmd /c copy /y .\\src\\index.html .\\dist\\",
+    "~cmd /c webpack --watch --progress"
+  ]
 }
