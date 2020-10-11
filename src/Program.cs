@@ -1,5 +1,6 @@
 ﻿using handy;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace yserver
@@ -24,6 +25,23 @@ namespace yserver
             {
                 log.e($"Failed to load config file: {configfile}");
                 return;
+            }
+            if (cfg.onstart != null)
+            {
+                EmrInstance.Each((EmrInstance)cfg.onstart, (i, n, k) =>
+                {
+                    if (i.Type == InstanceType.String)
+                    {
+                        bool isasync = false;
+                        var cm = (string)i.val;
+                        if (cm.StartsWith('~'))
+                        {
+                            cm = cm.Substring(1);
+                            isasync = true;
+                        }
+                        Cmd.Run(cm, isasync);
+                    }
+                });
             }
             Extensions.Socket((int)cfg.port, (x) =>
             {
