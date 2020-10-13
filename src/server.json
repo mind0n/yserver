@@ -3,9 +3,21 @@
   "rooturl": "/",
   "rootdir": "/",
   "entrydoc": "index.html",
+  "tasks": {
+    "cleanup": "cmd /c erase .\\dist\\*.* /Q",
+    "assets": "cmd /c copy /y .\\src\\index.html .\\dist\\",
+    "wp": "cmd /c npx --no-install webpack",
+    "wpw": "~cmd /c npx --no-install webpack --watch --progress"
+  },
   "onstart": [
-    "cmd /c erase .\\dist\\*.* /Q",
-    "cmd /c copy /y .\\src\\index.html .\\dist\\",
-    "~cmd /c webpack --watch --progress"
+    "cleanup",
+    "assets",
+    "wpw"
+  ],
+  "monitor": [
+    {
+      "target": ".\\src\\*.html",
+      "task": "assets"
+    }
   ]
 }

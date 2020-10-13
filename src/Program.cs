@@ -2,8 +2,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
-namespace yserver
+namespace ncserver
 {
     public class Program
     {
@@ -21,10 +22,25 @@ namespace yserver
                 return;
             }
             cfg = EmrInstance.LoadFile(configfile);
+            var basedir = cfg.basedir;
+            if (!string.IsNullOrWhiteSpace(basedir))
+            {
+                Environment.CurrentDirectory = basedir;
+            }
             if (cfg == null)
             {
                 log.e($"Failed to load config file: {configfile}");
                 return;
+            }
+            if (cfg.tasks != null)
+            {
+                EmrInstance.Each((EmrInstance)cfg.tasks, (i, n, k) =>
+                {
+                    if (i.Type == InstanceType.String)
+                    {
+                        Cmd.RegistTask(k, i.val);
+                    }
+                });
             }
             if (cfg.onstart != null)
             {
@@ -34,11 +50,6 @@ namespace yserver
                     {
                         bool isasync = false;
                         var cm = (string)i.val;
-                        if (cm.StartsWith('~'))
-                        {
-                            cm = cm.Substring(1);
-                            isasync = true;
-                        }
                         Cmd.Run(cm, isasync);
                     }
                 });
@@ -50,9 +61,6 @@ namespace yserver
                 var txt = r.Raw;
                 log.i($"Request -> {txt}");
                 var ctx = new SocketHttpContext(x);
-                //var hs = new HttpStateMachine();
-                //hs.Parse(txt);
-                //var sr = hs.Result;
                 var content = rm.Execute(ctx);
                 if (content != null)
                 {
@@ -64,12 +72,24 @@ namespace yserver
                     log.i("Replied internally");
                 }
             });
+            var m = new FileMonitor();
+            if (cfg.monitor != null)
+            {
+                EmrInstance.Each((EmrInstance)cfg.monitor, (i, n, k) =>
+                {
+                    var tar = i.Get<string>("target");
+                    var tas = i.Get<string>("task");
+                    m.Add(tas, tar);
+                });
+                m.Start();
+            }
             Console.WriteLine("Press ESC to exit ...");
             while (true)
             {
                 var ch = Console.ReadKey();
                 if (ch.Key == ConsoleKey.Escape)
                 {
+                    m.Stop();
                     break;
                 }
             }
