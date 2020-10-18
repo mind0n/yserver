@@ -2,22 +2,5 @@
   "port": 8880,
   "rooturl": "/",
   "rootdir": "/",
-  "entrydoc": "index.html",
-  "tasks": {
-    "cleanup": "cmd /c erase .\\dist\\*.* /Q",
-    "assets": "cmd /c copy /y .\\src\\index.html .\\dist\\",
-    "wp": "cmd /c npx --no-install webpack",
-    "wpw": "~cmd /c npx --no-install webpack --watch --progress"
-  },
-  "onstart": [
-    "cleanup",
-    "assets",
-    "wpw"
-  ],
-  "monitor": [
-    {
-      "target": ".\\src\\*.html",
-      "task": "assets"
-    }
-  ]
+  "entrydoc": "index.html"
 }

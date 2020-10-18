@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace ncserver
@@ -61,16 +62,26 @@ namespace ncserver
                 var txt = r.Raw;
                 log.i($"Request -> {txt}");
                 var ctx = new SocketHttpContext(x);
-                var content = rm.Execute(ctx);
-                if (content != null)
+                var rlt = rm.Execute(ctx);
+                if (rlt != null)
                 {
-                    s.Write(content);
-                    log.i($"Replied <- {content?.Length}");
+                    if (rlt is string)
+                    {
+                        var content = (string)rlt;
+                        s.Write(content);
+                        log.i($"Replied <- {content?.Length}");
+                        return new HandleResult(content);
+                    }
+                    else if (rlt is HandleResult)
+                    {
+                        return (HandleResult)rlt;
+                    }
                 }
                 else
                 {
                     log.i("Replied internally");
                 }
+                return new HandleResult() { IsContentRequired = false };
             });
             var m = new FileMonitor();
             if (cfg.monitor != null)
@@ -97,10 +108,30 @@ namespace ncserver
     }
     public class WebBizUnit : BizUnit
     {
+        const string K_Upgrade = "UPGRADE";
+        const string K_SKey = "Sec-WebSocket-Key";
+        const string K_SAccept = "Sec-WebSocket-Accept";
+        const string K_Connection = "Connection";
         static EmrInstance cfg => Program.cfg;
         public WebBizUnit(SocketHttpContext ctx) : base(ctx) { }
-        public string Default()
+        public object Default()
         {
+            var headers = Request.Headers;
+            if (headers.ContainsKey(K_Upgrade) && "websocket".Equals(headers[K_Upgrade]))
+            {
+                var bk = headers.Get<string>(K_SKey);
+                var a = $"{bk}258EAFA5-E914-47DA-95CA-C5AB0DC85B11"; //Encoding.UTF8.GetString(Convert.FromBase64String(bk));
+                using (var sha1 = System.Security.Cryptography.SHA1.Create())
+                {
+                    var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(a));
+                    Response.Socket.Headers[K_SAccept] = Convert.ToBase64String(hash);
+                    Response.Socket.Headers[K_Connection] = "Upgrade";
+                    Response.HttpStatusCode = 101;
+                    Response.Socket.Headers[K_Upgrade] = "websocket";
+                }
+                Response.Socket.Write();
+                return new HandleResult() { KeepAlive = true };
+            }
             var rooturl = cfg.Get("rooturl", "/");
             var rootdir = cfg.Get("rootdir", Environment.CurrentDirectory);
             if ("/".Equals(rootdir) || "\\".Equals(rootdir))
