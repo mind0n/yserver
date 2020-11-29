@@ -3,6 +3,7 @@
   "rooturl": "/",
   "rootdir": "/",
   "entrydoc": "index.html",
+  "autoreload": true,
   "tasks": {
     "assets": "cmd /c copy /y ..\\..\\..\\index.html .\\"
   },

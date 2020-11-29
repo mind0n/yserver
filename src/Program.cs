@@ -56,6 +56,7 @@ namespace ncserver
                     }
                 });
             }
+            bool autoreload = cfg.autoreload;
             var wss = new WebSocketStep();
             StreamListener.Steps.Regist(new HttpReadStep(), new HttpRouteStep(rm), wss);
             var listener = new SocketListener("httpread", "httproute");
@@ -80,9 +81,12 @@ namespace ncserver
                 });
                 m.Start(()=>
                 {
-                    var frame = new WebSocketFrame();
-                    frame.Take("reload");
-                    wss.Reply(frame.ToBytes());
+                    if (autoreload)
+                    {
+                        var frame = new WebSocketFrame();
+                        frame.Take("reload");
+                        wss.Reply(frame.ToBytes());
+                    }
                 });
             }
             Console.WriteLine("Press ESC to exit ...");
@@ -142,7 +146,38 @@ namespace ncserver
             if (File.Exists(p))
             {
                 Response.HttpStatusCode = 200;
-                Response.Socket.WriteFile(p);
+                if (cfg.Get("autoreload", false) && p.IndexOf(Program.cfg.entrydoc, StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    var ap = @"
+        <script type='text/javascript'>
+            var ltime = document.getElementById('ltime');
+            ltime.innerHTML = new Date().getSeconds();
+            var ws = new WebSocket('ws://localhost:8880/websocket');
+            ws.onopen = function(evt) {
+              console.log('Connection open ...');
+              ws.send('Hello WebSockets!');
+            };
+    
+            ws.onmessage = function(evt) {
+                console.log('Received Message: ' + evt.data);
+                if (evt.data == 'reload'){
+                    location.reload(true);
+                }
+            };
+    
+            ws.onclose = function(evt) {
+              console.log('Connection closed.');
+            };
+        </script>
+";
+                    var ab = Encoding.UTF8.GetBytes(ap);
+                    Response.Socket.WriteFile(p, ab);
+                }
+                else
+                {
+                    Response.Socket.WriteFile(p);
+                }
+
                 return null;
             }
             Response.HttpStatusCode = 404;
