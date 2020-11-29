@@ -16,7 +16,7 @@ namespace ncserver
             log.w($"Launched from:{Environment.CurrentDirectory}");
             Settings.Instance.Regist(new FileSettingsReader());
             RouteManager rm = new RouteManager();
-            rm.Regist(typeof(WebBizUnit), true, false);
+            rm.Regist(typeof(WebBizUnit), true, true);
             var configfile = Path.Combine(Environment.CurrentDirectory, "server.json");
             if (!File.Exists(configfile))
             {
@@ -122,11 +122,16 @@ namespace ncserver
             else if (!"/".Equals(rooturl))
             {
                 Response.HttpStatusCode = 404;
-                return $"404 - not found - {r}";
+                log.e($"Unknown route error ({r})");
+                return $"404 route not found - {r}";
             }
             if (!r.StartsWith('/'))
             {
                 r = '/' + r;
+            }
+            if ("/websocket".Equals(r, StringComparison.OrdinalIgnoreCase))
+            {
+                return new WebSocketResult();
             }
             var p = $"{rootdir.Replace('/', '\\')}{r.Replace('/', '\\')}".Replace("..", string.Empty);
             var entrydoc = cfg.Get<string>("entrydoc");
@@ -141,12 +146,8 @@ namespace ncserver
                 return null;
             }
             Response.HttpStatusCode = 404;
-            return $"404 not found - {p}";
-        }
-        public ExecuteResult WebSocket()
-        {
-            var rlt = new WebSocketResult();
-            return rlt;
+            log.e($"File missing error ({p})");
+            return $"404 file not found - {p}";
         }
     }
 }
