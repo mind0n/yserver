@@ -12,10 +12,11 @@ namespace ncserver
         public static dynamic cfg { get; set; }
         static void Main(string[] args)
         {
-            log.Regist(new FileLogWriter(), new ConsoleLogWriter());
+            log.Regist(new ConsoleLogWriter());
+            log.w($"Launched from:{Environment.CurrentDirectory}");
             Settings.Instance.Regist(new FileSettingsReader());
             RouteManager rm = new RouteManager();
-            rm.Regist(typeof(WebBizUnit), true, true);
+            rm.Regist(typeof(WebBizUnit), true, false);
             var configfile = Path.Combine(Environment.CurrentDirectory, "server.json");
             if (!File.Exists(configfile))
             {
@@ -55,34 +56,11 @@ namespace ncserver
                     }
                 });
             }
-            Extensions.Socket((int)cfg.port, (x) =>
-            {
-                var r = x.Request;
-                var s = x.Response;
-                var txt = r.Raw;
-                log.i($"Request -> {txt}");
-                var ctx = new SocketHttpContext(x);
-                var rlt = rm.Execute(ctx);
-                if (rlt != null)
-                {
-                    if (rlt is string)
-                    {
-                        var content = (string)rlt;
-                        s.Write(content);
-                        log.i($"Replied <- {content?.Length}");
-                        return new HandleResult(content);
-                    }
-                    else if (rlt is HandleResult)
-                    {
-                        return (HandleResult)rlt;
-                    }
-                }
-                else
-                {
-                    log.i("Replied internally");
-                }
-                return new HandleResult() { IsContentRequired = false };
-            });
+            var wss = new WebSocketStep();
+            StreamListener.Steps.Regist(new HttpReadStep(), new HttpRouteStep(rm), wss);
+            var listener = new SocketListener("httpread", "httproute");
+            listener.Listen((int)cfg.port).WaitOne();
+
             var m = new FileMonitor();
             if (cfg.monitor != null)
             {
@@ -90,9 +68,22 @@ namespace ncserver
                 {
                     var tar = i.Get<string>("target");
                     var tas = i.Get<string>("task");
-                    m.Add(tas, tar);
+                    var file = i.Get<string>("file");
+                    if (!string.IsNullOrWhiteSpace(file))
+                    {
+                        m.AddFile(file, tas);
+                    }
+                    else
+                    {
+                        m.Add(tas, tar);
+                    }
                 });
-                m.Start();
+                m.Start(()=>
+                {
+                    var frame = new WebSocketFrame();
+                    frame.Take("reload");
+                    wss.Reply(frame.ToBytes());
+                });
             }
             Console.WriteLine("Press ESC to exit ...");
             while (true)
@@ -113,25 +104,9 @@ namespace ncserver
         const string K_SAccept = "Sec-WebSocket-Accept";
         const string K_Connection = "Connection";
         static EmrInstance cfg => Program.cfg;
-        public WebBizUnit(SocketHttpContext ctx) : base(ctx) { }
+        public WebBizUnit(HttpStreamContext ctx) : base(ctx) { }
         public object Default()
         {
-            var headers = Request.Headers;
-            if (headers.ContainsKey(K_Upgrade) && "websocket".Equals(headers[K_Upgrade]))
-            {
-                var bk = headers.Get<string>(K_SKey);
-                var a = $"{bk}258EAFA5-E914-47DA-95CA-C5AB0DC85B11"; //Encoding.UTF8.GetString(Convert.FromBase64String(bk));
-                using (var sha1 = System.Security.Cryptography.SHA1.Create())
-                {
-                    var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(a));
-                    Response.Socket.Headers[K_SAccept] = Convert.ToBase64String(hash);
-                    Response.Socket.Headers[K_Connection] = "Upgrade";
-                    Response.HttpStatusCode = 101;
-                    Response.Socket.Headers[K_Upgrade] = "websocket";
-                }
-                Response.Socket.Write();
-                return new HandleResult() { KeepAlive = true };
-            }
             var rooturl = cfg.Get("rooturl", "/");
             var rootdir = cfg.Get("rootdir", Environment.CurrentDirectory);
             if ("/".Equals(rootdir) || "\\".Equals(rootdir))
@@ -167,6 +142,11 @@ namespace ncserver
             }
             Response.HttpStatusCode = 404;
             return $"404 not found - {p}";
+        }
+        public ExecuteResult WebSocket()
+        {
+            var rlt = new WebSocketResult();
+            return rlt;
         }
     }
 }
